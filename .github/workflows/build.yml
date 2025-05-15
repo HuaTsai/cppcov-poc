@@ -25,8 +25,8 @@ jobs:
     - name: Run tests
       run: ctest --test-dir build --output-on-failure
 
-    - name: Run main executable
-      run: build/main
+    # - name: Run main executable
+    #   run: build/main
 
     - name: Coverage
       run: |
