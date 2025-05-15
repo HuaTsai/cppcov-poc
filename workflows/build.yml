@@ -1,0 +1,41 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: sudo apt update && sudo apt install -y lcov libeigen3-dev
+
+    - name: Configure CMake
+      run: cmake -B build -DCOVERAGE=ON -DTESTING=ON
+
+    - name: Build
+      run: cmake --build build
+
+    - name: Run tests
+      run: ctest --test-dir build --output-on-failure
+
+    - name: Run main executable
+      run: build/main
+
+    - name: Coverage
+      run: |
+        lcov -c -d build -o coverage.info
+        lcov -r coverage.info '/usr/*' '*test*' -o coverage.info
+        lcov -l coverage.info
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+
