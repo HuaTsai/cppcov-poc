@@ -23,11 +23,11 @@ jobs:
       run: cmake --build build
 
     - name: Run tests
-      run: ctest --test-dir build --output-on-failure --ignore-errors mismatch
+      run: ctest --test-dir build --output-on-failure
 
     - name: Coverage
       run: |
-        lcov -c -d build -o coverage.info
+        lcov -c -d build --ignore-errors mismatch -o coverage.info
         lcov -r coverage.info '/usr/*' -o coverage.info
         lcov -l coverage.info
 
