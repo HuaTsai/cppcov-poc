@@ -22,8 +22,8 @@ jobs:
     - name: Build
       run: cmake --build build
 
-    - name: Run main executable
-      run: build/main
+    - name: Run tests
+      run: ctest --test-dir build --output-on-failure
 
     - name: Coverage
       run: |
@@ -35,6 +35,3 @@ jobs:
       uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-
-    - name: Run tests
-      run: ctest --test-dir build --output-on-failure
