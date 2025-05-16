@@ -1,0 +1,49 @@
+name: Build-SonarQube
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: sudo apt update && sudo apt install -y libeigen3-dev libgtest-dev
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.12
+
+    - name: Install gcovr
+      run: pip install gcovr
+
+    - name: Configure CMake
+      run: cmake -B build -DCOVERAGE=ON -DTESTING=ON
+
+    - name: Build
+      run: cmake --build build
+
+    - name: Run tests
+      run: ctest --test-dir build --output-on-failure
+
+    - name: Run main program
+      run: ./build/main
+
+    - name: Coverage
+      run: gcovr -r . --sonarqube --exclude '.*test.*' --exclude-throw-branches > coverage.xml
+
+    - name: Upload coverage reports to SonarQube
+      uses: SonarSource/sonarqube-scan-action@v4
+      env:
+        SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
+      with:
+        args: >
+          --define sonar.cfamily.compile-commands=build/compile_commands.json
+          --define sonar.coverageReportPaths=coverage.xml
