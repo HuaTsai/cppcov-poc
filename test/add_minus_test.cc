@@ -1,5 +1,6 @@
-#include <add.hpp>
 #include <gtest/gtest.h>
+
+#include <add.hpp>
 #include <minus.hpp>
 
 TEST(AddMinusTest, Add) {
